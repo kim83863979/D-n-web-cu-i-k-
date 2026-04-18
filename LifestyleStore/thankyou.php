@@ -1,11 +1,26 @@
 <?php
 // File: thankyou.php
 
+require 'connection.php';
+require 'users_items_schema.php';
+ensure_users_items_schema($con);
+
 // Lấy dữ liệu từ GET
 $orderId    = $_GET['orderId'] ?? '';
 $resultCode = $_GET['resultCode'] ?? '';
 $message    = $_GET['message'] ?? '';
 $amount     = $_GET['amount'] ?? '';
+$extraData  = $_GET['extraData'] ?? '';
+
+if ($resultCode === '0' && !empty($extraData)) {
+    $decoded = json_decode(base64_decode($extraData), true);
+    $user_id = isset($decoded['user_id']) ? (int)$decoded['user_id'] : 0;
+
+    if ($user_id > 0) {
+        $confirm_query = "UPDATE users_items SET status='Ordered MoMo' WHERE user_id='$user_id' AND status='Added to cart'";
+        mysqli_query($con, $confirm_query) or die(mysqli_error($con));
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">

@@ -85,21 +85,22 @@ CREATE TABLE `users_items` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `item_id` int(11) NOT NULL,
-  `status` enum('Added to cart','Confirmed') NOT NULL
+  `status` enum('Added to cart','Confirmed','Ordered COD','Ordered MoMo','Cancelled') NOT NULL DEFAULT 'Added to cart',
+  `quantity` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `users_items`
 --
 
-INSERT INTO `users_items` (`id`, `user_id`, `item_id`, `status`) VALUES
-(7, 3, 3, 'Added to cart'),
-(8, 3, 4, 'Added to cart'),
-(9, 3, 5, 'Added to cart'),
-(10, 3, 11, 'Added to cart'),
-(11, 1, 9, 'Added to cart'),
-(12, 1, 2, 'Added to cart'),
-(13, 1, 8, 'Added to cart');
+INSERT INTO `users_items` (`id`, `user_id`, `item_id`, `status`, `quantity`) VALUES
+(7, 3, 3, 'Added to cart', 1),
+(8, 3, 4, 'Added to cart', 1),
+(9, 3, 5, 'Added to cart', 1),
+(10, 3, 11, 'Added to cart', 1),
+(11, 1, 9, 'Added to cart', 1),
+(12, 1, 2, 'Added to cart', 1),
+(13, 1, 8, 'Added to cart', 1);
 
 --
 -- Indexes for dumped tables
