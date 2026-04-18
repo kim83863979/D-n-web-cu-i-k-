@@ -1,17 +1,6 @@
 <?php
 // File: momo_payment.php
 
-session_start();
-require 'connection.php';
-require 'users_items_schema.php';
-
-if (!isset($_SESSION['id'])) {
-    header('location: login.php');
-    exit();
-}
-
-ensure_users_items_schema($con);
-
 // 1️⃣ Load config
 $config = include('config_momo.php');
 
@@ -33,9 +22,7 @@ $orderId = 'ORDER' . time() . rand(1000,9999);
 $requestId = 'REQ' . time() . rand(1000,9999);
 $orderInfo = "Thanh toán đơn hàng #" . $orderId;
 $requestType = "captureWallet";
-$extraData = base64_encode(json_encode([
-    'user_id' => (int)$_SESSION['id']
-]));
+$extraData = ""; // nếu muốn gửi thêm dữ liệu
 
 // 4️⃣ Tạo signature
 $rawHash = "accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType";

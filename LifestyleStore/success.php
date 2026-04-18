@@ -1,25 +1,13 @@
 <?php
     session_start();
     require 'connection.php';
-    require 'users_items_schema.php';
     if(!isset($_SESSION['email'])){
         header('location:index.php');
-        exit();
     }else{
-        ensure_users_items_schema($con);
-        $order_message = "Khong co san pham nao trong gio hang de tao don COD.";
-
-        $user_id = (int)$_SESSION['id'];
-        $payment_method = $_POST['payment_method'] ?? '';
-
-        if ($payment_method === 'cod') {
-            $confirm_query="UPDATE users_items SET status='Ordered COD' WHERE user_id='$user_id' AND status='Added to cart'";
-            mysqli_query($con,$confirm_query) or die(mysqli_error($con));
-
-            if (mysqli_affected_rows($con) > 0) {
-                $order_message = "Don hang COD cua ban da duoc tao thanh cong. Cam on ban da mua hang.";
-            }
-        }
+        $user_id=$_GET['id'];
+        $confirm_query="update users_items set status='Confirmed' where user_id=$user_id";
+        $confirm_query_result=mysqli_query($con,$confirm_query) or die(mysqli_error($con));
+        
     }
 ?>
 <!DOCTYPE html>
@@ -50,7 +38,7 @@
                         <div class="panel panel-primary">
                             <div class="panel-heading"></div>
                             <div class="panel-body">
-                                <p><?= htmlspecialchars($order_message) ?> <a href="products.php">Click here</a> to purchase any other item.</p>
+                                <p>Your order is confirmed. Thank you for shopping with us. <a href="products.php">Click here</a> to purchase any other item.</p>
                             </div>
                         </div>
                     </div>

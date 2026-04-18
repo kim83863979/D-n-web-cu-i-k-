@@ -1,22 +1,19 @@
 <?php
 session_start();
 require 'connection.php';
-require 'users_items_schema.php';
 
 if(!isset($_SESSION['email'])){
     header('location: login.php');
     exit();
 }
 
-ensure_users_items_schema($con);
-
 $user_id = $_SESSION['id'];
 
 // Lấy sản phẩm trong giỏ hàng
-$user_products_query = "SELECT it.id, it.name, it.price, ut.quantity 
+$user_products_query = "SELECT it.id, it.name, it.price 
                         FROM users_items ut 
                         INNER JOIN items it ON it.id = ut.item_id 
-                        WHERE ut.user_id = '$user_id' AND ut.status = 'Added to cart'";
+                        WHERE ut.user_id = '$user_id'";
 $user_products_result = mysqli_query($con, $user_products_query) or die(mysqli_error($con));
 
 $no_of_user_products = mysqli_num_rows($user_products_result);
@@ -27,23 +24,9 @@ if($no_of_user_products == 0){
     echo "<script>window.alert('Giỏ hàng đang trống!');</script>";
 } else {
     while($row = mysqli_fetch_array($user_products_result)){
-        $line_total = ((int)$row['price']) * ((int)$row['quantity']);
-        $sum += $line_total;
-        $row['line_total'] = $line_total;
+        $sum += $row['price']; 
         $products[] = $row;
     }
-}
-
-$ordered_products_query = "SELECT it.id, it.name, it.price, ut.quantity, ut.status
-                          FROM users_items ut
-                          INNER JOIN items it ON it.id = ut.item_id
-                          WHERE ut.user_id = '$user_id' AND ut.status IN ('Ordered COD','Ordered MoMo','Confirmed')
-                          ORDER BY ut.id DESC";
-$ordered_products_result = mysqli_query($con, $ordered_products_query) or die(mysqli_error($con));
-$ordered_products = [];
-while ($ordered_row = mysqli_fetch_array($ordered_products_result)) {
-    $ordered_row['line_total'] = ((int)$ordered_row['price']) * ((int)$ordered_row['quantity']);
-    $ordered_products[] = $ordered_row;
 }
 ?>
 <!DOCTYPE html>
@@ -74,9 +57,7 @@ while ($ordered_row = mysqli_fetch_array($ordered_products_result)) {
                 <tr class="bg-info">
                     <th>STT</th>
                     <th>Tên sản phẩm</th>
-                    <th>Đơn giá (VNĐ)</th>
-                    <th>Số lượng</th>
-                    <th>Thành tiền (VNĐ)</th>
+                    <th>Giá (VNĐ)</th>
                     <th>Thao tác</th>
                 </tr>
             </thead>
@@ -89,85 +70,25 @@ while ($ordered_row = mysqli_fetch_array($ordered_products_result)) {
                     <td><?= $counter ?></td>
                     <td><?= htmlspecialchars($row['name']) ?></td>
                     <td><?= number_format($row['price']) ?></td>
-                    <td style="width: 220px;">
-                        <form action="cart_update.php" method="POST" class="form-inline" style="margin-bottom: 5px;">
-                            <input type="hidden" name="item_id" value="<?= (int)$row['id'] ?>">
-                            <input type="hidden" name="action" value="decrease">
-                            <button type="submit" class="btn btn-default btn-sm">-</button>
-                        </form>
-                        <form action="cart_update.php" method="POST" class="form-inline" style="display: inline-block; margin: 0 5px;">
-                            <input type="hidden" name="item_id" value="<?= (int)$row['id'] ?>">
-                            <input type="hidden" name="action" value="set">
-                            <input type="number" name="quantity" value="<?= (int)$row['quantity'] ?>" min="1" max="99" class="form-control input-sm" style="width: 70px;">
-                            <button type="submit" class="btn btn-default btn-sm">Cập nhật</button>
-                        </form>
-                        <form action="cart_update.php" method="POST" class="form-inline" style="display: inline-block;">
-                            <input type="hidden" name="item_id" value="<?= (int)$row['id'] ?>">
-                            <input type="hidden" name="action" value="increase">
-                            <button type="submit" class="btn btn-default btn-sm">+</button>
-                        </form>
-                    </td>
-                    <td><strong><?= number_format((int)$row['line_total']) ?></strong></td>
-                    <td>
-                        <a href="cart_remove.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm">Xóa</a>
-                    </td>
+                    <td><a href="cart_remove.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm">Xóa</a></td>
                 </tr>
                 <?php $counter++; } ?>
                 <tr class="bg-light">
-                    <td colspan="3"></td>
+                    <td></td>
                     <td><strong>Tổng cộng</strong></td>
                     <td><strong><?= number_format((int)$sum) ?> VNĐ</strong></td>
                     <td>
+                        <!-- Nút thanh toán MoMo -->
                         <form action="momo_payment.php" method="POST" style="display:inline;">
                             <input type="hidden" name="amount" value="<?= (int)$sum ?>">
                             <button type="submit" class="btn btn-primary">
                                 Thanh toán bằng Ví MoMo
                             </button>
                         </form>
-                        <form action="success.php" method="POST" style="display:inline; margin-left: 6px;">
-                            <input type="hidden" name="payment_method" value="cod">
-                            <button type="submit" class="btn btn-success">Thanh toán COD</button>
-                        </form>
                     </td>
                 </tr>
             </tbody>
         </table>
-
-        <h3>Đơn hàng đã đặt</h3>
-        <?php if (empty($ordered_products)) { ?>
-            <div class="alert alert-info">Bạn chưa có đơn hàng nào đang xử lý.</div>
-        <?php } else { ?>
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr class="bg-warning">
-                        <th>STT</th>
-                        <th>Tên sản phẩm</th>
-                        <th>Đơn giá (VNĐ)</th>
-                        <th>Số lượng</th>
-                        <th>Thành tiền (VNĐ)</th>
-                        <th>Phương thức</th>
-                        <th>Thao tác</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php $ordered_counter = 1; ?>
-                    <?php foreach ($ordered_products as $ordered_row) { ?>
-                        <tr>
-                            <td><?= $ordered_counter ?></td>
-                            <td><?= htmlspecialchars($ordered_row['name']) ?></td>
-                            <td><?= number_format((int)$ordered_row['price']) ?></td>
-                            <td><?= (int)$ordered_row['quantity'] ?></td>
-                            <td><strong><?= number_format((int)$ordered_row['line_total']) ?></strong></td>
-                            <td><?= htmlspecialchars($ordered_row['status']) ?></td>
-                            <td>
-                                <a href="order_cancel.php?item_id=<?= (int)$ordered_row['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn hủy đơn hàng này?');">Hủy đơn</a>
-                            </td>
-                        </tr>
-                        <?php $ordered_counter++; ?>
-                    <?php } ?>
-                </tbody>
-            </table>
-        <?php } ?>
     </div>
 
     <footer class="footer" style="margin-top: 100px;">
