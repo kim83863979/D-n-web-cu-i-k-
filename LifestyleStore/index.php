@@ -36,44 +36,44 @@ session_start();
            <div class="container">
                <div class="row">
                    <div class="col-xs-4">
-                       <div  class="thumbnail">
-                           <a href="products.php">
-                                <img src="img/camera.jpg" alt="Camera">
-                           </a>
-                           <center>
-                                <div class="caption">
-                                        <p id="autoResize">Cameras</p>
-                                        <p>Choose among the best available in the world.</p>
-                                </div>
-                           </center>
-                       </div>
-                   </div>
+                     <div class="thumbnail">
+                         <a href="products.php?cat=Jacket">
+                             <img src="img/1.jpg" alt="Jackets">
+                         </a>
+                         <center>
+                             <div class="caption">
+                                 <p id="autoResize">Áo Khoác</p>
+                                 <p>Các mẫu áo phao, hoodie và jacket mới nhất.</p>
+                             </div>
+                        </center>
+                     </div>
+                 </div>
+                   <div class="col-xs-4">
+                     <div class="thumbnail">
+                         <a href="products.php?cat=Pants">
+                             <img src="img/17.jpg" alt="Pants">
+                         </a>
+                         <center>
+                             <div class="caption">
+                                 <p id="autoResize">Quần Nam/Nữ</p>
+                                 <p>Quần Tây, Jean và Short thời trang.</p>
+                             </div>
+                         </center>
+                     </div>
+                </div>
                    <div class="col-xs-4">
                        <div class="thumbnail">
-                           <a href="products.php">
-                               <img src="img/watch.jpg" alt="Watch">
-                           </a>
-                           <center>
-                                <div class="caption">
-                                    <p id="autoResize">Watches</p>
-                                    <p>Original watches from the best brands.</p>
-                                </div>
-                           </center>
-                       </div>
-                   </div>
-                   <div class="col-xs-4">
-                       <div class="thumbnail">
-                           <a href="products.php">
-                               <img src="img/shirt.jpg" alt="Shirt">
-                           </a>
-                           <center>
-                               <div class="caption">
-                                   <p id="autoResize">Shirts</p>
-                                   <p>Our exquisite collection of shirts.</p>
-                               </div>
-                           </center>
-                       </div>
-                   </div>
+                         <a href="products.php?cat=T-Shirt">
+                             <img src="img/23.jpg" alt="T-Shirts">
+                         </a>
+                         <center>
+                             <div class="caption">
+                                 <p id="autoResize">Áo Thun</p>
+                                 <p>Áo thun basic và áo Polo năng động.</p>
+                             </div>
+                         </center>
+                     </div>
+                 </div>
                </div>
            </div>
             <br><br> <br><br><br><br>
