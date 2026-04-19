@@ -10,7 +10,7 @@ if(!isset($_SESSION['email'])){
 $user_id = $_SESSION['id'];
 
 // Lấy sản phẩm trong giỏ hàng
-$user_products_query = "SELECT it.id, it.name, it.price 
+$user_products_query = "SELECT it.id, it.name, it.price, it.price 
                         FROM users_items ut 
                         INNER JOIN items it ON it.id = ut.item_id 
                         WHERE ut.user_id = '$user_id'";
@@ -57,6 +57,7 @@ if($no_of_user_products == 0){
                 <tr class="bg-info">
                     <th>STT</th>
                     <th>Tên sản phẩm</th>
+                    <th>Size</th>
                     <th>Giá (VNĐ)</th>
                     <th>Thao tác</th>
                 </tr>
@@ -69,6 +70,7 @@ if($no_of_user_products == 0){
                 <tr>
                     <td><?= $counter ?></td>
                     <td><?= htmlspecialchars($row['name']) ?></td>
+                    <td><?= htmlspecialchars($row['size']) ?></td>
                     <td><?= number_format($row['price']) ?></td>
                     <td><a href="cart_remove.php?id=<?= $row['id'] ?>" class="btn btn-danger btn-sm">Xóa</a></td>
                 </tr>
