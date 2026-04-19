@@ -41,6 +41,9 @@
         //The mysqli_insert_id() function returns the id (generated with AUTO_INCREMENT) used in the last query.
         $_SESSION['id']=mysqli_insert_id($con); 
         //header('location: products.php');  //for redirecting
+
+        // Ghi nhớ quyền người dùng (User thường)
+        $_SESSION['role'] = 0;
         ?>
         <meta http-equiv="refresh" content="3;url=products.php" />
         <?php
