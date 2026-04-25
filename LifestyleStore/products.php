@@ -63,7 +63,7 @@
                                 <div class="sale-tag">-<?php echo $percent; ?>%</div>
                             <?php endif; ?>
 
-                            <img src="img/<?php echo $row['id']; ?>.jpg" alt="Product" style="height: 230px; object-fit: cover; width: 100%;">
+                            <img src="img/<?php echo $row['image']; ?>" alt="Product" style="height: 230px; object-fit: cover; width: 100%;">
                             
                             <div class="caption text-center">
                                 <h4 style="height: 40px; overflow: hidden; font-weight: bold;"><?php echo $row['name']; ?></h4>
