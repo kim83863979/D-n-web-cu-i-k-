@@ -27,7 +27,7 @@ body {
 
 /* NAVBAR */
 .navbar {
-  background: #d4dfe0 !important; /* Trắng tinh 100% */
+  background: #ffffff !important; /* Trắng tinh 100% */
   border-bottom: 1px solid #e2e8f0; /* Viền xám nhạt dứt khoát */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); /* Đổ bóng nhẹ tách khỏi nền */
   transition: all 0.3s;
@@ -324,7 +324,7 @@ footer {
   width: 100%;
   min-height: 50px;
   padding: 10px 0;
-  background: #d4dfe0; /* Trắng tinh */
+  background: #f6f6f6; /* Trắng tinh */
   color: var(--secondary);
   z-index: 1030;
   font-size: 14px; /* Tăng từ 13px lên 14px */
