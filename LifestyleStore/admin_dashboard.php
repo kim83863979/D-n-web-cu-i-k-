@@ -5,6 +5,41 @@ if(!isset($_SESSION['email']) || $_SESSION['role'] != 1){
     header('location: login.php');
     exit();
 }
+
+require 'connection.php';
+
+$query_products = "SELECT COUNT(id) AS total FROM items";
+$result_products = mysqli_query($con, $query_products);
+$total_products = mysqli_fetch_assoc($result_products)['total'] ?? 0;
+
+$query_customers = "SELECT COUNT(id) AS total FROM users WHERE role = 0";
+$result_customers = mysqli_query($con, $query_customers);
+$total_customers = mysqli_fetch_assoc($result_customers)['total'] ?? 0;
+
+$query_orders = "SELECT COUNT(id) AS total FROM users_items WHERE status IN ('Ordered COD', 'Ordered MoMo')";
+$result_orders = mysqli_query($con, $query_orders);
+$total_orders = mysqli_fetch_assoc($result_orders)['total'] ?? 0;
+
+$query_revenue = "SELECT SUM(it.price * ut.quantity) AS total 
+                  FROM users_items ut 
+                  INNER JOIN items it ON ut.item_id = it.id 
+                  WHERE ut.status IN ('Ordered COD', 'Ordered MoMo')";
+$result_revenue = mysqli_query($con, $query_revenue);
+$total_revenue = mysqli_fetch_assoc($result_revenue)['total'] ?? 0;
+
+$formatted_revenue = number_format($total_revenue);
+if ($total_revenue >= 1000000) {
+    $formatted_revenue = round($total_revenue / 1000000, 1) . 'tr';
+}
+
+// lấy dữ liệu các đơn hàng mới nhất
+$query_recent_orders = "SELECT ut.id, u.name as customer_name, it.name as item_name, ut.status 
+                        FROM users_items ut 
+                        INNER JOIN users u ON ut.user_id = u.id 
+                        INNER JOIN items it ON ut.item_id = it.id 
+                        WHERE u.role = 0 
+                        ORDER BY ut.id DESC LIMIT 5";
+$recent_orders_result = mysqli_query($con, $query_recent_orders);
 ?>
 
 <!DOCTYPE html>
@@ -65,7 +100,7 @@ if(!isset($_SESSION['email']) || $_SESSION['role'] != 1){
                     <div class="icon-wrapper"><i class="fa-solid fa-box"></i></div>
                     <div class="card-info">
                         <h4>Sản phẩm</h4>
-                        <h2>120</h2>
+                        <h2><?= $total_products ?></h2>
                     </div>
                 </div>
             </div>
@@ -75,7 +110,7 @@ if(!isset($_SESSION['email']) || $_SESSION['role'] != 1){
                     <div class="icon-wrapper"><i class="fa-solid fa-cart-arrow-down"></i></div>
                     <div class="card-info">
                         <h4>Đơn hàng</h4>
-                        <h2>75</h2>
+                        <h2><?= $total_orders ?></h2>
                     </div>
                 </div>
             </div>
@@ -85,7 +120,7 @@ if(!isset($_SESSION['email']) || $_SESSION['role'] != 1){
                     <div class="icon-wrapper"><i class="fa-solid fa-users"></i></div>
                     <div class="card-info">
                         <h4>Khách hàng</h4>
-                        <h2>50</h2>
+                        <h2><?= $total_customers ?></h2>
                     </div>
                 </div>
             </div>
@@ -95,27 +130,40 @@ if(!isset($_SESSION['email']) || $_SESSION['role'] != 1){
                     <div class="icon-wrapper"><i class="fa-solid fa-wallet"></i></div>
                     <div class="card-info">
                         <h4>Doanh thu</h4>
-                        <h2>30tr</h2>
+                        <h2><?= $formatted_revenue ?></h2>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="row" style="margin-top: 30px;">
-            <div class="col-md-8">
-                <div style="background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                    <h4 style="font-weight: 600; color: #475569; margin-bottom: 20px;">Thống kê Doanh thu</h4>
-                    <canvas id="revenueChart" height="100"></canvas>
-                </div>
-            </div>
+            <div class="card shadow">
+    <div class="card-header bg-white">
+        <h3 class="mb-0 text-center" style="font-weight: bold; font-size: 20px;">Đơn hàng mới nhất</h3>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th>Khách hàng</th>
+                    <th>Sản phẩm</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while($order = mysqli_fetch_assoc($recent_orders_result)) { ?>
+                <tr>
+                    <td><?= htmlspecialchars($order['customer_name']) ?></td>
+                    <td><?= htmlspecialchars($order['item_name']) ?></td>
+                    <td><span class="badge <?= ($order['status'] == 'Ordered COD' || $order['status'] == 'Ordered MoMo') ? 'bg-warning text-dark' : 'bg-secondary' ?>"><?= $order['status'] ?></span></td>
+                </tr>
+                <?php } ?>
+            </tbody>
+        </table>
+    </div>
+</div>
 
-            <div class="col-md-4">
-                <div style="background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                    <h4 style="font-weight: 600; color: #475569; margin-bottom: 20px;">Trạng thái Đơn hàng</h4>
-                    <canvas id="orderChart" height="215"></canvas>
-                </div>
-            </div>
-        </div>
+            
     </div>
 
     <!-- FOOTER -->
@@ -126,7 +174,7 @@ if(!isset($_SESSION['email']) || $_SESSION['role'] != 1){
                 Contact Us: +91 90000 00000
             </p>
             <p class="m-0 mt-1 text-muted" style="font-size: 13px;">
-                This website is developed by Sajal Agrawal
+                This website is developed Nhom 6 Lap Trinh Web
             </p>
         </div>
     </footer>
@@ -141,42 +189,6 @@ if(!isset($_SESSION['email']) || $_SESSION['role'] != 1){
             }
         }
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script>
-        // 1. VẼ BIỂU ĐỒ CỘT (DOANH THU)
-        const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
-        new Chart(ctxRevenue, {
-            type: 'bar',
-            data: {
-                labels: ['Tuần 1', 'Tuần 2', 'Tuần 3', 'Tuần 4'],
-                datasets: [{
-                    label: 'Doanh thu (VNĐ)',
-                    data: [12000000, 19000000, 15000000, 25000000], // Số liệu giả lập
-                    backgroundColor: 'rgba(59, 130, 246, 0.8)', // Màu xanh dương hợp tone
-                    borderRadius: 8
-                }]
-            },
-            options: { responsive: true }
-        });
-
-        // 2. VẼ BIỂU ĐỒ TRÒN (TRẠNG THÁI ĐƠN HÀNG)
-        const ctxOrder = document.getElementById('orderChart').getContext('2d');
-        new Chart(ctxOrder, {
-            type: 'doughnut',
-            data: {
-                labels: ['Đã xác nhận', 'Đang chờ xử lý'],
-                datasets: [{
-                    data: [50, 25], // Số liệu giả lập
-                    backgroundColor: ['#10b981', '#f59e0b'], // Xanh ngọc và Cam
-                    hoverOffset: 4
-                }]
-            },
-            options: { responsive: true, cutout: '70%' }
-        });
-    </script>
-
 </body>
 
 </html>
